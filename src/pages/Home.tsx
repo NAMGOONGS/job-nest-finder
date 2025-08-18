@@ -83,38 +83,37 @@ const Home = () => {
         <div className="container-custom py-20 md:py-32">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <Badge variant="secondary" className="bg-primary-light text-primary mb-4">
-              🚀 Now connecting 10,000+ professionals
+              🚀 지금 바로 기업을 위한 인재를 추천받아 보세요!
             </Badge>
             <h1 className="text-hero">
-              Connect with Top Talent & 
-              <span className="block">Dream Opportunities</span>
+              메인 제목 블라블라 & 
+              <span className="block">메인제목 2행 블라블라 </span>
             </h1>
             <p className="text-subtitle max-w-2xl mx-auto">
-              Join the premier platform where exceptional talent meets innovative companies. 
-              Get matched, get referred, get hired.
+              소텍스트 블라블라블라블라 수정 가능 색상 변경가능
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="secondary" size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
                 <Users className="w-5 h-5 mr-2" />
-                Find Talent
+                인재 찾기
               </Button>
               <Button variant="outline" size="lg" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
                 <Briefcase className="w-5 h-5 mr-2" />
-                Browse Jobs
+                취업처 찾기
               </Button>
             </div>
             <div className="flex items-center justify-center space-x-8 text-sm opacity-90">
               <div className="flex items-center space-x-2">
                 <Building className="w-4 h-4" />
-                <span>500+ Companies</span>
+                <span>500+ 협업기업 </span>
               </div>
               <div className="flex items-center space-x-2">
                 <Users className="w-4 h-4" />
-                <span>10,000+ Professionals</span>
+                <span>10,000+ 취업준비생 </span>
               </div>
               <div className="flex items-center space-x-2">
                 <TrendingUp className="w-4 h-4" />
-                <span>95% Success Rate</span>
+                <span>95% 매칭데이 성공률</span>
               </div>
             </div>
           </div>
@@ -125,9 +124,9 @@ const Home = () => {
       <section className="py-20">
         <div className="container-custom">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">How We Connect Talent</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">두번째 섹션 메인 타이틀 </h2>
             <p className="text-subtitle max-w-2xl mx-auto">
-              Our comprehensive platform streamlines the hiring process for both candidates and companies
+              메인타이틀 보조 블라블라
             </p>
           </div>
           
