@@ -1,11 +1,21 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, Briefcase } from "lucide-react";
+import { Menu, X, User, Briefcase, LogOut } from "lucide-react";
+import { AuthModal } from "@/components/auth/AuthModal";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
   const navItems = [
     { name: "Home", href: "/" },
@@ -47,13 +57,32 @@ const Navbar = () => {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="sm">
-              <User className="w-4 h-4 mr-2" />
-              Sign In
-            </Button>
-            <Button variant="hero" size="sm">
-              Get Started
-            </Button>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <User className="w-4 h-4 mr-2" />
+                    {user.email}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={signOut}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    로그아웃
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" onClick={() => setIsAuthModalOpen(true)}>
+                  <User className="w-4 h-4 mr-2" />
+                  로그인
+                </Button>
+                <Button variant="hero" size="sm" onClick={() => setIsAuthModalOpen(true)}>
+                  시작하기
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -86,18 +115,32 @@ const Navbar = () => {
                 </Link>
               ))}
               <div className="pt-4 border-t border-border mt-4 space-y-2">
-                <Button variant="ghost" size="sm" className="w-full justify-start">
-                  <User className="w-4 h-4 mr-2" />
-                  Sign In
-                </Button>
-                <Button variant="hero" size="sm" className="w-full">
-                  Get Started
-                </Button>
+                {user ? (
+                  <Button variant="ghost" size="sm" className="w-full justify-start" onClick={signOut}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    로그아웃
+                  </Button>
+                ) : (
+                  <>
+                    <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => setIsAuthModalOpen(true)}>
+                      <User className="w-4 h-4 mr-2" />
+                      로그인
+                    </Button>
+                    <Button variant="hero" size="sm" className="w-full" onClick={() => setIsAuthModalOpen(true)}>
+                      시작하기
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>
         )}
       </div>
+      
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+      />
     </nav>
   );
 };
