@@ -18,10 +18,10 @@ const Navbar = () => {
   const { user, signOut } = useAuth();
 
   const navItems = [
-    { name: "Home", href: "/" },
-    { name: "Talent Pool", href: "/talent" },
-    { name: "Job Board", href: "/jobs" },
-    { name: "Community", href: "/community" },
+    { name: "메인페이지", href: "/" },
+    { name: "인재채용풀", href: "/talent" },
+    { name: "취업보드", href: "/jobs" },
+    { name: "커뮤니티", href: "/community" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
