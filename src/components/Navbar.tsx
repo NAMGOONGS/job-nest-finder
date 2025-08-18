@@ -35,7 +35,7 @@ const Navbar = () => {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <Briefcase className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-foreground">TalentConnect</span>
+            <span className="text-xl font-bold text-foreground">엑스퍼트아카데미</span>
           </Link>
 
           {/* Desktop Navigation */}
