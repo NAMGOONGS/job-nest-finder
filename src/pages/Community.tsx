@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -244,9 +245,11 @@ const Community = () => {
 
                   {/* Post Content */}
                   <div className="space-y-3">
-                    <h3 className="text-lg font-semibold hover:text-primary cursor-pointer">
-                      {post.title}
-                    </h3>
+                    <Link to={`/community/${post.id}`}>
+                      <h3 className="text-lg font-semibold hover:text-primary cursor-pointer">
+                        {post.title}
+                      </h3>
+                    </Link>
                     <p className="text-muted-foreground leading-relaxed">
                       {post.content}
                     </p>
@@ -273,9 +276,11 @@ const Community = () => {
                         <span>{post.replies}개 댓글</span>
                       </button>
                     </div>
-                    <Button variant="ghost" size="sm">
-                      답글
-                    </Button>
+                    <Link to={`/community/${post.id}`}>
+                      <Button variant="ghost" size="sm">
+                        답글
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               ))}

@@ -7,8 +7,11 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import TalentPool from "./pages/TalentPool";
+import TalentDetail from "./pages/TalentDetail";
 import JobBoard from "./pages/JobBoard";
+import JobDetail from "./pages/JobDetail";
 import Community from "./pages/Community";
+import CommunityPost from "./pages/CommunityPost";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,8 +27,11 @@ const App = () => (
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="talent" element={<TalentPool />} />
+              <Route path="talent/:id" element={<TalentDetail />} />
               <Route path="jobs" element={<JobBoard />} />
+              <Route path="jobs/:id" element={<JobDetail />} />
               <Route path="community" element={<Community />} />
+              <Route path="community/:id" element={<CommunityPost />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

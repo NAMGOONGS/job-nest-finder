@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -291,10 +292,12 @@ const JobBoard = () => {
                 <Button variant="hero" className="flex-1 sm:flex-none">
                   지원하기
                 </Button>
-                <Button variant="professional" className="flex-1 sm:flex-none">
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  상세보기
-                </Button>
+                <Link to={`/jobs/${job.id}`}>
+                  <Button variant="professional" className="flex-1 sm:flex-none">
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    상세보기
+                  </Button>
+                </Link>
                 <Button variant="ghost" size="sm">
                   공유
                 </Button>

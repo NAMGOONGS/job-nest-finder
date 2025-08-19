@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -244,10 +245,12 @@ const TalentPool = () => {
 
               {/* Actions */}
               <div className="flex space-x-3">
-                <Button variant="hero" className="flex-1">
-                  프로필 보기
-                  <ExternalLink className="w-4 h-4 ml-2" />
-                </Button>
+                <Link to={`/talent/${talent.id}`} className="flex-1">
+                  <Button variant="hero" className="w-full">
+                    프로필 보기
+                    <ExternalLink className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
                 <Button variant="professional" className="flex-1">
                   메시지 보내기
                 </Button>
