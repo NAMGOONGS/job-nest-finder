@@ -95,10 +95,10 @@ const TalentPool = () => {
       <section className="bg-secondary border-b border-border">
         <div className="container-custom py-12">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Talent Pool</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">인재풀</h1>
             <p className="text-subtitle">
-              Discover exceptional professionals ready for their next opportunity. 
-              Connect with top talent across various industries and skill sets.
+              다음 기회를 기다리는 뛰어난 전문가들을 만나보세요. 
+              다양한 산업과 기술 분야의 최고 인재들과 연결하세요.
             </p>
           </div>
         </div>
@@ -111,7 +111,7 @@ const TalentPool = () => {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search by name, title, or skills..."
+                placeholder="이름, 직책, 또는 기술로 검색..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -121,60 +121,60 @@ const TalentPool = () => {
             <div className="flex flex-col sm:flex-row gap-4">
               <Select>
                 <SelectTrigger className="w-full sm:w-48">
-                  <SelectValue placeholder="Experience Level" />
+                  <SelectValue placeholder="경력 수준" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="junior">Junior (1-3 years)</SelectItem>
-                  <SelectItem value="mid">Mid-level (3-5 years)</SelectItem>
-                  <SelectItem value="senior">Senior (5+ years)</SelectItem>
-                  <SelectItem value="lead">Lead/Principal (8+ years)</SelectItem>
+                  <SelectItem value="junior">주니어 (1-3년)</SelectItem>
+                  <SelectItem value="mid">미드레벨 (3-5년)</SelectItem>
+                  <SelectItem value="senior">시니어 (5년 이상)</SelectItem>
+                  <SelectItem value="lead">리드/프린시펄 (8년 이상)</SelectItem>
                 </SelectContent>
               </Select>
               
               <Select>
                 <SelectTrigger className="w-full sm:w-48">
-                  <SelectValue placeholder="Location" />
+                  <SelectValue placeholder="지역" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="remote">Remote</SelectItem>
-                  <SelectItem value="sf">San Francisco</SelectItem>
-                  <SelectItem value="ny">New York</SelectItem>
-                  <SelectItem value="seattle">Seattle</SelectItem>
-                  <SelectItem value="austin">Austin</SelectItem>
+                  <SelectItem value="remote">원격근무</SelectItem>
+                  <SelectItem value="seoul">서울</SelectItem>
+                  <SelectItem value="busan">부산</SelectItem>
+                  <SelectItem value="daegu">대구</SelectItem>
+                  <SelectItem value="incheon">인천</SelectItem>
                 </SelectContent>
               </Select>
               
               <Select>
                 <SelectTrigger className="w-full sm:w-48">
-                  <SelectValue placeholder="Availability" />
+                  <SelectValue placeholder="가능 여부" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="available">Available</SelectItem>
-                  <SelectItem value="busy">Busy</SelectItem>
-                  <SelectItem value="not-looking">Not Looking</SelectItem>
+                  <SelectItem value="available">가능</SelectItem>
+                  <SelectItem value="busy">바쁨</SelectItem>
+                  <SelectItem value="not-looking">구직중 아님</SelectItem>
                 </SelectContent>
               </Select>
               
               <Button variant="professional">
                 <Filter className="w-4 h-4 mr-2" />
-                Filters
+                필터
               </Button>
             </div>
           </div>
           
           <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>Showing {filteredTalents.length} professionals</span>
+            <span>{filteredTalents.length}명의 전문가 표시</span>
             <div className="flex items-center space-x-4">
-              <span>Sort by:</span>
+              <span>정렬:</span>
               <Select defaultValue="relevance">
                 <SelectTrigger className="w-32">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="relevance">Relevance</SelectItem>
-                  <SelectItem value="rating">Rating</SelectItem>
-                  <SelectItem value="experience">Experience</SelectItem>
-                  <SelectItem value="availability">Availability</SelectItem>
+                  <SelectItem value="relevance">관련성</SelectItem>
+                  <SelectItem value="rating">평점</SelectItem>
+                  <SelectItem value="experience">경력</SelectItem>
+                  <SelectItem value="availability">가능 여부</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -204,7 +204,7 @@ const TalentPool = () => {
                   variant={talent.availability === "Available" ? "default" : "secondary"}
                   className={talent.availability === "Available" ? "bg-green-100 text-green-800" : ""}
                 >
-                  {talent.availability}
+                  {talent.availability === "Available" ? "가능" : talent.availability === "Busy" ? "바쁨" : "구직중 아님"}
                 </Badge>
               </div>
 
@@ -232,7 +232,7 @@ const TalentPool = () => {
 
               {/* Skills */}
               <div className="space-y-2">
-                <div className="text-sm font-medium">Core Skills</div>
+                <div className="text-sm font-medium">핵심 기술</div>
                 <div className="flex flex-wrap gap-2">
                   {talent.skills.map((skill, idx) => (
                     <Badge key={idx} variant="secondary" className="text-xs">
@@ -245,11 +245,11 @@ const TalentPool = () => {
               {/* Actions */}
               <div className="flex space-x-3">
                 <Button variant="hero" className="flex-1">
-                  View Profile
+                  프로필 보기
                   <ExternalLink className="w-4 h-4 ml-2" />
                 </Button>
                 <Button variant="professional" className="flex-1">
-                  Send Message
+                  메시지 보내기
                 </Button>
               </div>
             </div>
@@ -259,7 +259,7 @@ const TalentPool = () => {
         {/* Load More */}
         <div className="text-center mt-12">
           <Button variant="professional" size="lg">
-            Load More Talent
+            더 많은 인재 보기
           </Button>
         </div>
       </section>

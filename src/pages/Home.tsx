@@ -7,21 +7,21 @@ const Home = () => {
   const services = [
     {
       icon: Users,
-      title: "Talent Matching",
-      description: "AI-powered matching system that connects the right talent with the right opportunities.",
-      features: ["Smart Algorithm", "Skill Assessment", "Culture Fit"]
+      title: "인재 매칭",
+      description: "AI 기반 매칭 시스템으로 최적의 인재와 기회를 연결합니다.",
+      features: ["스마트 알고리즘", "스킬 평가", "문화 적합성"]
     },
     {
       icon: Target,
-      title: "Employee Referrals",
-      description: "Leverage your network to find exceptional candidates through our referral program.",
-      features: ["Referral Bonuses", "Quality Candidates", "Faster Hiring"]
+      title: "추천 채용",
+      description: "네트워크를 활용하여 우수한 인재를 추천받는 프로그램입니다.",
+      features: ["추천 보너스", "검증된 인재", "빠른 채용"]
     },
     {
       icon: Award,
-      title: "Career Growth",
-      description: "Professional development and career advancement opportunities for top talent.",
-      features: ["Mentorship", "Skill Development", "Career Planning"]
+      title: "커리어 성장",
+      description: "전문가를 위한 커리어 발전과 성장 기회를 제공합니다.",
+      features: ["멘토링", "스킬 개발", "커리어 플래닝"]
     }
   ];
 
@@ -86,11 +86,12 @@ const Home = () => {
               🚀 지금 바로 기업을 위한 인재를 추천받아 보세요!
             </Badge>
             <h1 className="text-hero">
-              메인 제목 블라블라 & 
-              <span className="block">메인제목 2행 블라블라 </span>
+              전문가와 기업을 연결하는 
+              <span className="block">최고의 플랫폼</span>
             </h1>
             <p className="text-subtitle max-w-2xl mx-auto">
-              소텍스트 블라블라블라블라 수정 가능 색상 변경가능
+              엑스퍼트아카데미에서 당신의 커리어를 한 단계 업그레이드하세요. 
+              최고의 인재와 기업이 만나는 공간입니다.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="secondary" size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
@@ -105,15 +106,15 @@ const Home = () => {
             <div className="flex items-center justify-center space-x-8 text-sm opacity-90">
               <div className="flex items-center space-x-2">
                 <Building className="w-4 h-4" />
-                <span>500+ 협업기업 </span>
+                <span>500+ 협업기업</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Users className="w-4 h-4" />
-                <span>10,000+ 취업준비생 </span>
+                <span>10,000+ 전문가</span>
               </div>
               <div className="flex items-center space-x-2">
                 <TrendingUp className="w-4 h-4" />
-                <span>95% 매칭데이 성공률</span>
+                <span>95% 매칭 성공률</span>
               </div>
             </div>
           </div>
@@ -124,9 +125,9 @@ const Home = () => {
       <section className="py-20">
         <div className="container-custom">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">두번째 섹션 메인 타이틀 </h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">전문 서비스</h2>
             <p className="text-subtitle max-w-2xl mx-auto">
-              메인타이틀 보조 블라블라
+              엑스퍼트아카데미가 제공하는 차별화된 서비스를 경험해보세요
             </p>
           </div>
           
@@ -148,7 +149,7 @@ const Home = () => {
                   </div>
                 </div>
                 <Button variant="professional" className="w-full">
-                  Learn More
+                  자세히 보기
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
@@ -162,12 +163,12 @@ const Home = () => {
         <div className="container-custom">
           <div className="flex items-center justify-between mb-12">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Featured Opportunities</h2>
-              <p className="text-muted-foreground">Discover your next career move with top companies</p>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">추천 채용 공고</h2>
+              <p className="text-muted-foreground">최고의 기업들과 함께할 다음 커리어를 찾아보세요</p>
             </div>
             <Link to="/jobs">
               <Button variant="professional">
-                View All Jobs
+                모든 채용공고 보기
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
@@ -200,7 +201,7 @@ const Home = () => {
                 </div>
                 
                 <Button variant="professional" className="w-full">
-                  Apply Now
+                  지원하기
                 </Button>
               </div>
             ))}
@@ -212,9 +213,9 @@ const Home = () => {
       <section className="py-20">
         <div className="container-custom">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Success Stories</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">성공 스토리</h2>
             <p className="text-subtitle max-w-2xl mx-auto">
-              See how TalentConnect has transformed careers and companies
+              엑스퍼트아카데미가 어떻게 커리어와 기업을 변화시켰는지 확인해보세요
             </p>
           </div>
 
@@ -252,21 +253,21 @@ const Home = () => {
       <section className="py-20 bg-accent">
         <div className="container-custom text-center">
           <div className="max-w-3xl mx-auto space-y-8">
-            <h2 className="text-3xl md:text-4xl font-bold">Ready to Make Your Next Move?</h2>
+            <h2 className="text-3xl md:text-4xl font-bold">다음 단계로 나아갈 준비가 되셨나요?</h2>
             <p className="text-subtitle">
-              Join thousands of professionals who have found their perfect match through TalentConnect
+              엑스퍼트아카데미를 통해 완벽한 매칭을 찾은 수천 명의 전문가들과 함께하세요
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/talent">
                 <Button variant="hero" size="lg">
                   <Users className="w-5 h-5 mr-2" />
-                  Join as Talent
+                  전문가로 참여하기
                 </Button>
               </Link>
               <Link to="/jobs">
                 <Button variant="professional" size="lg">
                   <Building className="w-5 h-5 mr-2" />
-                  Post a Job
+                  채용공고 등록
                 </Button>
               </Link>
             </div>

@@ -90,11 +90,11 @@ const Community = () => {
   ];
 
   const categories = [
-    { id: "all", name: "All Posts", count: posts.length, icon: MessageSquare },
-    { id: "announcements", name: "Announcements", count: 12, icon: Pin },
-    { id: "qa", name: "Q&A", count: 34, icon: MessageSquare },
-    { id: "success-stories", name: "Success Stories", count: 28, icon: Star },
-    { id: "networking", name: "Networking", count: 19, icon: Users }
+    { id: "all", name: "전체 게시물", count: posts.length, icon: MessageSquare },
+    { id: "announcements", name: "공지사항", count: 12, icon: Pin },
+    { id: "qa", name: "질문 & 답변", count: 34, icon: MessageSquare },
+    { id: "success-stories", name: "성공 스토리", count: 28, icon: Star },
+    { id: "networking", name: "네트워킹", count: 19, icon: Users }
   ];
 
   const [activeCategory, setActiveCategory] = useState("all");
@@ -122,10 +122,10 @@ const Community = () => {
       <section className="bg-secondary border-b border-border">
         <div className="container-custom py-12">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Community</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">커뮤니티</h1>
             <p className="text-subtitle">
-              Connect with fellow professionals, share experiences, ask questions, 
-              and celebrate career successes together.
+              동료 전문가들과 연결하고, 경험을 공유하며, 질문하고, 
+              함께 커리어 성공을 축하하세요.
             </p>
           </div>
         </div>
@@ -137,22 +137,22 @@ const Community = () => {
           <div className="lg:col-span-1 space-y-6">
             {/* Quick Actions */}
             <div className="card-professional p-6 space-y-4">
-              <h3 className="font-semibold">Quick Actions</h3>
+              <h3 className="font-semibold">빠른 작업</h3>
               <div className="space-y-2">
                 <Button variant="hero" className="w-full justify-start">
                   <Plus className="w-4 h-4 mr-2" />
-                  New Post
+                  새 게시물
                 </Button>
                 <Button variant="professional" className="w-full justify-start">
                   <TrendingUp className="w-4 h-4 mr-2" />
-                  Trending Topics
+                  인기 주제
                 </Button>
               </div>
             </div>
 
             {/* Categories */}
             <div className="card-professional p-6 space-y-4">
-              <h3 className="font-semibold">Categories</h3>
+              <h3 className="font-semibold">카테고리</h3>
               <div className="space-y-2">
                 {categories.map((category) => (
                   <button
@@ -178,19 +178,19 @@ const Community = () => {
 
             {/* Community Stats */}
             <div className="card-professional p-6 space-y-4">
-              <h3 className="font-semibold">Community Stats</h3>
+              <h3 className="font-semibold">커뮤니티 통계</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Total Members</span>
-                  <span className="font-medium">2,847</span>
+                  <span className="text-muted-foreground">전체 회원</span>
+                  <span className="font-medium">2,847명</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Posts This Week</span>
-                  <span className="font-medium">127</span>
+                  <span className="text-muted-foreground">이번 주 게시물</span>
+                  <span className="font-medium">127개</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Active Today</span>
-                  <span className="font-medium">342</span>
+                  <span className="text-muted-foreground">오늘 활성 사용자</span>
+                  <span className="font-medium">342명</span>
                 </div>
               </div>
             </div>
@@ -203,7 +203,7 @@ const Community = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search posts..."
+                  placeholder="게시물 검색..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
@@ -270,11 +270,11 @@ const Community = () => {
                       </button>
                       <button className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-primary transition-colors">
                         <MessageSquare className="w-4 h-4" />
-                        <span>{post.replies} replies</span>
+                        <span>{post.replies}개 댓글</span>
                       </button>
                     </div>
                     <Button variant="ghost" size="sm">
-                      Reply
+                      답글
                     </Button>
                   </div>
                 </div>
@@ -284,7 +284,7 @@ const Community = () => {
             {/* Load More */}
             <div className="text-center">
               <Button variant="professional" size="lg">
-                Load More Posts
+                더 많은 게시물 보기
               </Button>
             </div>
           </div>

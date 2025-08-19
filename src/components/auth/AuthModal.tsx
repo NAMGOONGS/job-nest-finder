@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { authService } from "@/lib/supabase";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 
 interface AuthModalProps {
@@ -32,29 +32,18 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password,
-      });
-
-      if (error) {
-        toast({
-          title: "로그인 실패",
-          description: error.message,
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "로그인 성공",
-          description: "환영합니다!",
-        });
-        onClose();
-        setFormData({ email: "", password: "", confirmPassword: "" });
-      }
-    } catch (error) {
+      await authService.signInWithEmail(formData.email, formData.password);
+      
       toast({
-        title: "오류",
-        description: "로그인 중 오류가 발생했습니다.",
+        title: "로그인 성공",
+        description: "환영합니다!",
+      });
+      onClose();
+      setFormData({ email: "", password: "", confirmPassword: "" });
+    } catch (error: any) {
+      toast({
+        title: "로그인 실패",
+        description: error.message || "로그인 중 오류가 발생했습니다.",
         variant: "destructive",
       });
     } finally {
@@ -77,34 +66,18 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     setIsLoading(true);
 
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      await authService.signUpWithEmail(formData.email, formData.password);
       
-      const { error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          emailRedirectTo: redirectUrl
-        }
-      });
-
-      if (error) {
-        toast({
-          title: "회원가입 실패",
-          description: error.message,
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "회원가입 성공",
-          description: "이메일을 확인해주세요.",
-        });
-        onClose();
-        setFormData({ email: "", password: "", confirmPassword: "" });
-      }
-    } catch (error) {
       toast({
-        title: "오류",
-        description: "회원가입 중 오류가 발생했습니다.",
+        title: "회원가입 성공",
+        description: "이메일을 확인해주세요.",
+      });
+      onClose();
+      setFormData({ email: "", password: "", confirmPassword: "" });
+    } catch (error: any) {
+      toast({
+        title: "회원가입 실패",
+        description: error.message || "회원가입 중 오류가 발생했습니다.",
         variant: "destructive",
       });
     } finally {

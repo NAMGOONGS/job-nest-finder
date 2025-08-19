@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { authService } from "@/lib/supabase";
 
 interface AuthContextType {
   user: User | null;
@@ -17,8 +17,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    // 인증 상태 변화 감지 설정
+    const { data: { subscription } } = authService.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
@@ -26,8 +26,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     );
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // 기존 세션 확인
+    authService.getCurrentSession().then((session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setIsLoading(false);
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await authService.signOut();
   };
 
   const value = {

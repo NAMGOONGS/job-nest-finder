@@ -113,10 +113,10 @@ const JobBoard = () => {
       <section className="bg-secondary border-b border-border">
         <div className="container-custom py-12">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Job Board</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">채용 공고</h1>
             <p className="text-subtitle">
-              Explore exciting opportunities at leading companies. Find your perfect role 
-              and take the next step in your career journey.
+              선도 기업들의 흥미진진한 기회를 탐색해보세요. 완벽한 역할을 찾고 
+              커리어 여정의 다음 단계로 나아가세요.
             </p>
           </div>
         </div>
@@ -129,7 +129,7 @@ const JobBoard = () => {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search jobs, companies, or skills..."
+                placeholder="채용공고, 회사명, 또는 기술로 검색..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -139,61 +139,61 @@ const JobBoard = () => {
             <div className="flex flex-col sm:flex-row gap-4">
               <Select>
                 <SelectTrigger className="w-full sm:w-48">
-                  <SelectValue placeholder="Job Type" />
+                  <SelectValue placeholder="고용 형태" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="full-time">Full-time</SelectItem>
-                  <SelectItem value="part-time">Part-time</SelectItem>
-                  <SelectItem value="contract">Contract</SelectItem>
-                  <SelectItem value="internship">Internship</SelectItem>
+                  <SelectItem value="full-time">정규직</SelectItem>
+                  <SelectItem value="part-time">파트타임</SelectItem>
+                  <SelectItem value="contract">계약직</SelectItem>
+                  <SelectItem value="internship">인턴십</SelectItem>
                 </SelectContent>
               </Select>
               
               <Select>
                 <SelectTrigger className="w-full sm:w-48">
-                  <SelectValue placeholder="Location" />
+                  <SelectValue placeholder="지역" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="remote">Remote</SelectItem>
-                  <SelectItem value="sf">San Francisco</SelectItem>
-                  <SelectItem value="ny">New York</SelectItem>
-                  <SelectItem value="seattle">Seattle</SelectItem>
-                  <SelectItem value="austin">Austin</SelectItem>
+                  <SelectItem value="remote">원격근무</SelectItem>
+                  <SelectItem value="seoul">서울</SelectItem>
+                  <SelectItem value="busan">부산</SelectItem>
+                  <SelectItem value="daegu">대구</SelectItem>
+                  <SelectItem value="incheon">인천</SelectItem>
                 </SelectContent>
               </Select>
               
               <Select>
                 <SelectTrigger className="w-full sm:w-48">
-                  <SelectValue placeholder="Salary Range" />
+                  <SelectValue placeholder="연봉 범위" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="50-80">$50k - $80k</SelectItem>
-                  <SelectItem value="80-120">$80k - $120k</SelectItem>
-                  <SelectItem value="120-160">$120k - $160k</SelectItem>
-                  <SelectItem value="160+">$160k+</SelectItem>
+                  <SelectItem value="3000-5000">3,000만원 - 5,000만원</SelectItem>
+                  <SelectItem value="5000-7000">5,000만원 - 7,000만원</SelectItem>
+                  <SelectItem value="7000-10000">7,000만원 - 1억원</SelectItem>
+                  <SelectItem value="10000+">1억원 이상</SelectItem>
                 </SelectContent>
               </Select>
               
               <Button variant="professional">
                 <Filter className="w-4 h-4 mr-2" />
-                Filters
+                필터
               </Button>
             </div>
           </div>
           
           <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>Showing {filteredJobs.length} jobs</span>
+            <span>{filteredJobs.length}개의 채용공고 표시</span>
             <div className="flex items-center space-x-4">
-              <span>Sort by:</span>
+              <span>정렬:</span>
               <Select defaultValue="recent">
                 <SelectTrigger className="w-32">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="recent">Most Recent</SelectItem>
-                  <SelectItem value="salary">Salary</SelectItem>
-                  <SelectItem value="relevance">Relevance</SelectItem>
-                  <SelectItem value="company">Company</SelectItem>
+                  <SelectItem value="recent">최신순</SelectItem>
+                  <SelectItem value="salary">연봉순</SelectItem>
+                  <SelectItem value="relevance">관련성</SelectItem>
+                  <SelectItem value="company">회사명</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -234,7 +234,7 @@ const JobBoard = () => {
                 <div className="flex items-center space-x-1">
                   <MapPin className="w-4 h-4" />
                   <span>{job.location}</span>
-                  {job.remote && <Badge variant="secondary" className="ml-2 text-xs">Remote OK</Badge>}
+                  {job.remote && <Badge variant="secondary" className="ml-2 text-xs">원격근무 가능</Badge>}
                 </div>
                 <div className="flex items-center space-x-1">
                   <Clock className="w-4 h-4" />
@@ -244,7 +244,7 @@ const JobBoard = () => {
                   <DollarSign className="w-4 h-4" />
                   <span className="font-medium text-primary">{job.salary}</span>
                 </div>
-                <span>Posted {job.posted}</span>
+                <span>{job.posted} 게시</span>
               </div>
 
               {/* Description */}
@@ -264,7 +264,7 @@ const JobBoard = () => {
               {/* Requirements & Benefits Preview */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
                 <div>
-                  <h4 className="font-medium mb-2">Key Requirements</h4>
+                  <h4 className="font-medium mb-2">주요 요구사항</h4>
                   <ul className="space-y-1 text-muted-foreground">
                     {job.requirements.slice(0, 3).map((req, idx) => (
                       <li key={idx} className="flex items-start space-x-2">
@@ -275,7 +275,7 @@ const JobBoard = () => {
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-medium mb-2">Benefits</h4>
+                  <h4 className="font-medium mb-2">혜택</h4>
                   <div className="flex flex-wrap gap-1">
                     {job.benefits.map((benefit, idx) => (
                       <Badge key={idx} variant="outline" className="text-xs">
@@ -289,14 +289,14 @@ const JobBoard = () => {
               {/* Actions */}
               <div className="flex space-x-3 pt-2">
                 <Button variant="hero" className="flex-1 sm:flex-none">
-                  Apply Now
+                  지원하기
                 </Button>
                 <Button variant="professional" className="flex-1 sm:flex-none">
                   <ExternalLink className="w-4 h-4 mr-2" />
-                  View Details
+                  상세보기
                 </Button>
                 <Button variant="ghost" size="sm">
-                  Share
+                  공유
                 </Button>
               </div>
             </div>
@@ -306,7 +306,7 @@ const JobBoard = () => {
         {/* Load More */}
         <div className="text-center mt-12">
           <Button variant="professional" size="lg">
-            Load More Jobs
+            더 많은 채용공고 보기
           </Button>
         </div>
       </section>
