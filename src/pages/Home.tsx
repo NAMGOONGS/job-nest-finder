@@ -94,14 +94,18 @@ const Home = () => {
               최고의 인재와 기업이 만나는 공간입니다.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="secondary" size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
-                <Users className="w-5 h-5 mr-2" />
-                인재 찾기
-              </Button>
-              <Button variant="outline" size="lg" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
-                <Briefcase className="w-5 h-5 mr-2" />
-                취업처 찾기
-              </Button>
+              <Link to="/talent">
+                <Button variant="secondary" size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+                  <Users className="w-5 h-5 mr-2" />
+                  인재 찾기
+                </Button>
+              </Link>
+              <Link to="/jobs">
+                <Button variant="outline" size="lg" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+                  <Briefcase className="w-5 h-5 mr-2" />
+                  취업처 찾기
+                </Button>
+              </Link>
             </div>
             <div className="flex items-center justify-center space-x-8 text-sm opacity-90">
               <div className="flex items-center space-x-2">
@@ -148,10 +152,12 @@ const Home = () => {
                     ))}
                   </div>
                 </div>
-                <Button variant="professional" className="w-full">
-                  자세히 보기
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
+                <Link to={service.title === "인재 매칭" ? "/talent" : service.title === "추천 채용" ? "/jobs" : "/community"}>
+                  <Button variant="professional" className="w-full">
+                    자세히 보기
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
               </div>
             ))}
           </div>
@@ -200,9 +206,11 @@ const Home = () => {
                   ))}
                 </div>
                 
-                <Button variant="professional" className="w-full">
-                  지원하기
-                </Button>
+                <Link to={`/jobs/${index + 1}`}>
+                  <Button variant="professional" className="w-full">
+                    지원하기
+                  </Button>
+                </Link>
               </div>
             ))}
           </div>
