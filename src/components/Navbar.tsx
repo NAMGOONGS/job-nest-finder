@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, Briefcase, LogOut } from "lucide-react";
+import { Menu, X, User, Briefcase, LogOut, Shield } from "lucide-react";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +17,7 @@ const Navbar = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const { isAdmin } = useUserRole();
 
   const navItems = [
     { name: "메인페이지", href: "/" },
@@ -66,6 +68,14 @@ const Navbar = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  {isAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin" className="flex items-center">
+                        <Shield className="w-4 h-4 mr-2" />
+                        관리자 대시보드
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={signOut}>
                     <LogOut className="w-4 h-4 mr-2" />
                     로그아웃
@@ -116,10 +126,25 @@ const Navbar = () => {
               ))}
               <div className="pt-4 border-t border-border mt-4 space-y-2">
                 {user ? (
-                  <Button variant="ghost" size="sm" className="w-full justify-start" onClick={signOut}>
-                    <LogOut className="w-4 h-4 mr-2" />
-                    로그아웃
-                  </Button>
+                  <>
+                    {isAdmin && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="w-full justify-start" 
+                        asChild
+                      >
+                        <Link to="/admin">
+                          <Shield className="w-4 h-4 mr-2" />
+                          관리자 대시보드
+                        </Link>
+                      </Button>
+                    )}
+                    <Button variant="ghost" size="sm" className="w-full justify-start" onClick={signOut}>
+                      <LogOut className="w-4 h-4 mr-2" />
+                      로그아웃
+                    </Button>
+                  </>
                 ) : (
                   <>
                     <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => setIsAuthModalOpen(true)}>

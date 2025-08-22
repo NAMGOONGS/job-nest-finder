@@ -13,6 +13,7 @@ import JobDetail from "./pages/JobDetail";
 import Community from "./pages/Community";
 import CommunityWrite from "./pages/CommunityWrite";
 import CommunityPost from "./pages/CommunityPost";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
               <Route path="community" element={<Community />} />
               <Route path="community/write" element={<CommunityWrite />} />
               <Route path="community/:id" element={<CommunityPost />} />
+              <Route path="admin" element={<AdminDashboard />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
