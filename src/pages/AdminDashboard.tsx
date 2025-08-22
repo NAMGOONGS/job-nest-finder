@@ -33,7 +33,7 @@ interface UserWithRole {
   email: string;
   display_name: string;
   created_at: string;
-  user_roles: { role: string }[];
+  role: string;
 }
 
 const AdminDashboard = () => {
@@ -68,40 +68,32 @@ const AdminDashboard = () => {
       // 사용자 목록 조회
       const { data: usersData, error: usersError } = await supabase
         .from('profiles')
-        .select(`
-          id,
-          email,
-          display_name,
-          created_at,
-          user_roles (role)
-        `)
+        .select('id, email, display_name, created_at')
         .order('created_at', { ascending: false });
 
       if (usersError) {
         console.error('Error fetching users:', usersError);
         toast.error("사용자 데이터를 불러오는데 실패했습니다.");
       } else {
-        setUsers(usersData || []);
+        // 각 사용자의 역할 정보 조회
+        const usersWithRoles = await Promise.all(
+          (usersData || []).map(async (user) => {
+            const { data: roleData } = await supabase.rpc('get_user_role', {
+              _user_id: user.id
+            });
+            return {
+              ...user,
+              role: roleData || 'user'
+            };
+          })
+        );
+        setUsers(usersWithRoles);
       }
 
       // 게시글 목록 조회
       const { data: postsData, error: postsError } = await supabase
         .from('community_posts')
-        .select(`
-          id,
-          title,
-          category,
-          user_id,
-          created_at,
-          likes_count,
-          replies_count,
-          profiles (
-            id,
-            email,
-            display_name,
-            created_at
-          )
-        `)
+        .select('id, title, category, user_id, created_at, likes_count, replies_count')
         .order('created_at', { ascending: false })
         .limit(20);
 
@@ -109,13 +101,28 @@ const AdminDashboard = () => {
         console.error('Error fetching posts:', postsError);
         toast.error("게시글 데이터를 불러오는데 실패했습니다.");
       } else {
-        setPosts(postsData || []);
+        // 각 게시글의 작성자 정보 조회
+        const postsWithProfiles = await Promise.all(
+          (postsData || []).map(async (post) => {
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('id, email, display_name, created_at')
+              .eq('id', post.user_id)
+              .single();
+            
+            return {
+              ...post,
+              profiles: profileData || { id: post.user_id, email: '', display_name: '', created_at: '' }
+            };
+          })
+        );
+        setPosts(postsWithProfiles);
       }
 
       // 통계 계산
       const totalUsers = usersData?.length || 0;
       const totalPosts = postsData?.length || 0;
-      const totalAdmins = usersData?.filter(u => u.user_roles?.some(r => r.role === 'admin')).length || 0;
+      const totalAdmins = users.filter(u => u.role === 'admin').length;
 
       setStats({
         totalUsers,
@@ -153,8 +160,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const getRoleBadgeVariant = (roles: { role: string }[]) => {
-    const role = roles?.[0]?.role || 'user';
+  const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case 'admin':
         return 'destructive';
@@ -165,8 +171,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const getRoleText = (roles: { role: string }[]) => {
-    const role = roles?.[0]?.role || 'user';
+  const getRoleText = (role: string) => {
     switch (role) {
       case 'admin':
         return '관리자';
@@ -264,8 +269,8 @@ const AdminDashboard = () => {
                   <TableCell className="font-medium">{user.email}</TableCell>
                   <TableCell>{user.display_name || '-'}</TableCell>
                   <TableCell>
-                    <Badge variant={getRoleBadgeVariant(user.user_roles)}>
-                      {getRoleText(user.user_roles)}
+                    <Badge variant={getRoleBadgeVariant(user.role)}>
+                      {getRoleText(user.role)}
                     </Badge>
                   </TableCell>
                   <TableCell>
