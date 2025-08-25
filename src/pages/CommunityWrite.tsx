@@ -56,7 +56,7 @@ const CommunityWrite = () => {
     setIsSubmitting(true);
     
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('community_posts')
         .insert({
           user_id: user.id,
@@ -64,12 +64,20 @@ const CommunityWrite = () => {
           content: content.trim(),
           category,
           tags
-        });
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
 
       toast.success("게시글이 성공적으로 작성되었습니다!");
-      navigate("/community");
+      
+      // 작성된 게시글로 바로 이동
+      if (data?.id) {
+        navigate(`/community/${data.id}`);
+      } else {
+        navigate("/community");
+      }
     } catch (error) {
       console.error("Error creating post:", error);
       toast.error("게시글 작성 중 오류가 발생했습니다.");
