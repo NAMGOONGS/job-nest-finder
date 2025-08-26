@@ -13,6 +13,8 @@ import JobDetail from "./pages/JobDetail";
 import Community from "./pages/Community";
 import CommunityWrite from "./pages/CommunityWrite";
 import CommunityPost from "./pages/CommunityPost";
+import CommunityEdit from "./pages/CommunityEdit";
+import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
@@ -35,6 +37,8 @@ const App = () => (
               <Route path="community" element={<Community />} />
               <Route path="community/write" element={<CommunityWrite />} />
               <Route path="community/:id" element={<CommunityPost />} />
+              <Route path="community/:id/edit" element={<CommunityEdit />} />
+              <Route path="profile" element={<Profile />} />
               <Route path="admin" element={<AdminDashboard />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

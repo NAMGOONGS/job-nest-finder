@@ -16,7 +16,9 @@ import {
   Flag,
   MoreHorizontal,
   Send,
-  User
+  User,
+  Edit,
+  Trash2
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -48,10 +50,13 @@ const CommunityPost = () => {
   const [author, setAuthor] = useState<PostAuthor | null>(null);
   const [loading, setLoading] = useState(true);
   const [newComment, setNewComment] = useState("");
+  const [comments, setComments] = useState<any[]>([]);
+  const [submittingComment, setSubmittingComment] = useState(false);
 
   useEffect(() => {
     if (id) {
       fetchPost();
+      fetchComments();
     }
   }, [id]);
 
@@ -95,6 +100,87 @@ const CommunityPost = () => {
       navigate('/community');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchComments = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('community_post_replies')
+        .select(`
+          *,
+          profiles:user_id (
+            display_name,
+            email
+          )
+        `)
+        .eq('post_id', id)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching comments:', error);
+        return;
+      }
+
+      setComments(data || []);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    }
+  };
+
+  const handleSubmitComment = async () => {
+    if (!user || !newComment.trim()) return;
+
+    setSubmittingComment(true);
+    try {
+      const { error } = await supabase
+        .from('community_post_replies')
+        .insert({
+          post_id: id,
+          user_id: user.id,
+          content: newComment.trim()
+        });
+
+      if (error) {
+        console.error('Error creating comment:', error);
+        toast.error('댓글 작성 중 오류가 발생했습니다.');
+        return;
+      }
+
+      setNewComment("");
+      toast.success('댓글이 작성되었습니다.');
+      fetchComments();
+      fetchPost(); // 댓글 수 업데이트를 위해
+    } catch (error) {
+      console.error('Error creating comment:', error);
+      toast.error('댓글 작성 중 오류가 발생했습니다.');
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
+
+  const handleDeletePost = async () => {
+    if (!user || !post || post.user_id !== user.id) return;
+    
+    if (!window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('community_posts')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting post:', error);
+        toast.error('게시글 삭제 중 오류가 발생했습니다.');
+        return;
+      }
+
+      toast.success('게시글이 삭제되었습니다.');
+      navigate('/community');
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      toast.error('게시글 삭제 중 오류가 발생했습니다.');
     }
   };
 
@@ -204,10 +290,26 @@ const CommunityPost = () => {
                         </div>
                       </div>
                     </div>
-                    
-                    <Button variant="ghost" size="sm">
-                      <MoreHorizontal className="w-4 h-4" />
-                    </Button>
+                     
+                    {user && post.user_id === user.id && (
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => navigate(`/community/${id}/edit`)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={handleDeletePost}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                   
                   <h1 className="text-2xl md:text-3xl font-bold">{post.title}</h1>
@@ -280,9 +382,14 @@ const CommunityPost = () => {
                           onChange={(e) => setNewComment(e.target.value)}
                         />
                         <div className="flex justify-end">
-                          <Button variant="hero" size="sm">
+                          <Button 
+                            variant="hero" 
+                            size="sm"
+                            onClick={handleSubmitComment}
+                            disabled={!newComment.trim() || submittingComment}
+                          >
                             <Send className="w-4 h-4 mr-2" />
-                            댓글 작성
+                            {submittingComment ? '작성 중...' : '댓글 작성'}
                           </Button>
                         </div>
                       </div>
@@ -290,11 +397,69 @@ const CommunityPost = () => {
                   </div>
                 )}
                 
-                {/* Comments List Placeholder */}
-                <div className="text-center py-8 text-muted-foreground">
-                  <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                  <p>아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!</p>
-                </div>
+                {/* Comments List */}
+                {comments.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                    <p>아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {comments.map((comment) => (
+                      <div key={comment.id} className="flex items-start space-x-3 p-4 rounded-lg bg-secondary/50">
+                        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                          <span className="text-primary-foreground text-xs font-medium">
+                            {comment.profiles?.display_name?.substring(0, 2).toUpperCase() || 
+                             comment.profiles?.email?.substring(0, 2).toUpperCase() || 'U'}
+                          </span>
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center space-x-2">
+                              <span className="font-medium text-sm">
+                                {comment.profiles?.display_name || comment.profiles?.email || '사용자'}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {formatTimeAgo(comment.created_at)}
+                              </span>
+                            </div>
+                            {user && comment.user_id === user.id && (
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={async () => {
+                                  if (window.confirm('댓글을 삭제하시겠습니까?')) {
+                                    try {
+                                      const { error } = await supabase
+                                        .from('community_post_replies')
+                                        .delete()
+                                        .eq('id', comment.id);
+                                      
+                                      if (error) throw error;
+                                      
+                                      toast.success('댓글이 삭제되었습니다.');
+                                      fetchComments();
+                                      fetchPost();
+                                    } catch (error) {
+                                      console.error('Error deleting comment:', error);
+                                      toast.error('댓글 삭제 중 오류가 발생했습니다.');
+                                    }
+                                  }
+                                }}
+                                className="text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+                            {comment.content}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

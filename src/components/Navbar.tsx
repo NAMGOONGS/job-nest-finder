@@ -68,6 +68,12 @@ const Navbar = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="flex items-center">
+                      <User className="w-4 h-4 mr-2" />
+                      마이페이지
+                    </Link>
+                  </DropdownMenuItem>
                   {isAdmin && (
                     <DropdownMenuItem asChild>
                       <Link to="/admin" className="flex items-center">
@@ -125,27 +131,38 @@ const Navbar = () => {
                 </Link>
               ))}
               <div className="pt-4 border-t border-border mt-4 space-y-2">
-                {user ? (
-                  <>
-                    {isAdmin && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="w-full justify-start" 
-                        asChild
-                      >
-                        <Link to="/admin">
-                          <Shield className="w-4 h-4 mr-2" />
-                          관리자 대시보드
-                        </Link>
-                      </Button>
-                    )}
-                    <Button variant="ghost" size="sm" className="w-full justify-start" onClick={signOut}>
-                      <LogOut className="w-4 h-4 mr-2" />
-                      로그아웃
-                    </Button>
-                  </>
-                ) : (
+                 {user ? (
+                   <>
+                     <Button 
+                       variant="ghost" 
+                       size="sm" 
+                       className="w-full justify-start" 
+                       asChild
+                     >
+                       <Link to="/profile">
+                         <User className="w-4 h-4 mr-2" />
+                         마이페이지
+                       </Link>
+                     </Button>
+                     {isAdmin && (
+                       <Button 
+                         variant="ghost" 
+                         size="sm" 
+                         className="w-full justify-start" 
+                         asChild
+                       >
+                         <Link to="/admin">
+                           <Shield className="w-4 h-4 mr-2" />
+                           관리자 대시보드
+                         </Link>
+                       </Button>
+                     )}
+                     <Button variant="ghost" size="sm" className="w-full justify-start" onClick={signOut}>
+                       <LogOut className="w-4 h-4 mr-2" />
+                       로그아웃
+                     </Button>
+                   </>
+                 ) : (
                   <>
                     <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => setIsAuthModalOpen(true)}>
                       <User className="w-4 h-4 mr-2" />
