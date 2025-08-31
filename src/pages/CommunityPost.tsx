@@ -1,195 +1,239 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+import { useUserRole } from '../hooks/useUserRole';
+import { supabase } from '../integrations/supabase/client';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Textarea } from '../components/ui/textarea';
+import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
+import { Badge } from '../components/ui/badge';
+import { Separator } from '../components/ui/separator';
 import { 
   ArrowLeft, 
-  ThumbsUp, 
   MessageSquare, 
-  Share, 
-  Clock, 
-  Pin,
-  Heart,
-  Flag,
-  MoreHorizontal,
-  Send,
-  User,
+  Heart, 
+  Trash2, 
   Edit,
-  Trash2
-} from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
-import { toast } from "sonner";
+  Image as ImageIcon,
+  X
+} from 'lucide-react';
 
 interface CommunityPost {
   id: string;
   title: string;
   content: string;
-  category: string;
-  tags: string[];
-  is_pinned: boolean;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
   likes_count: number;
   replies_count: number;
-  created_at: string;
+  images?: string[];
+  user: {
+    display_name: string;
+    avatar_url?: string;
+  };
+}
+
+interface Reply {
+  id: string;
+  content: string;
   user_id: string;
+  created_at: string;
+  updated_at: string;
+  user: {
+    display_name: string;
+    avatar_url?: string;
+  };
 }
 
-interface PostAuthor {
-  display_name: string | null;
-  email: string | null;
-}
-
-const CommunityPost = () => {
-  const { id } = useParams();
+const CommunityPost: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { userRole } = useUserRole();
+  
   const [post, setPost] = useState<CommunityPost | null>(null);
-  const [author, setAuthor] = useState<PostAuthor | null>(null);
+  const [replies, setReplies] = useState<Reply[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newComment, setNewComment] = useState("");
-  const [comments, setComments] = useState<any[]>([]);
-  const [submittingComment, setSubmittingComment] = useState(false);
+  const [replyContent, setReplyContent] = useState('');
+  const [submittingReply, setSubmittingReply] = useState(false);
+  const [editingReply, setEditingReply] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState('');
 
   useEffect(() => {
     if (id) {
       fetchPost();
-      fetchComments();
+      fetchReplies();
     }
   }, [id]);
 
   const fetchPost = async () => {
     try {
-      setLoading(true);
-      
-      // 게시글 정보 가져오기
-      const { data: postData, error: postError } = await supabase
+      const { data, error } = await supabase
         .from('community_posts')
-        .select('*')
+        .select(`
+          *,
+          user:profiles(display_name, avatar_url)
+        `)
         .eq('id', id)
         .single();
 
-      if (postError) {
-        console.error('Error fetching post:', postError);
-        toast.error('게시글을 불러올 수 없습니다.');
-        navigate('/community');
-        return;
-      }
-
-      setPost(postData);
-
-      // 작성자 정보 가져오기
-      if (postData.user_id) {
-        const { data: authorData, error: authorError } = await supabase
-          .from('profiles')
-          .select('display_name, email')
-          .eq('id', postData.user_id)
-          .single();
-
-        if (authorError) {
-          console.error('Error fetching author:', authorError);
-        } else {
-          setAuthor(authorData);
-        }
-      }
+      if (error) throw error;
+      setPost(data);
     } catch (error) {
       console.error('Error fetching post:', error);
-      toast.error('게시글을 불러오는 중 오류가 발생했습니다.');
-      navigate('/community');
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchComments = async () => {
+  const fetchReplies = async () => {
     try {
       const { data, error } = await supabase
         .from('community_post_replies')
         .select(`
           *,
-          profiles:user_id (
-            display_name,
-            email
-          )
+          user:profiles(display_name, avatar_url)
         `)
         .eq('post_id', id)
         .order('created_at', { ascending: true });
 
-      if (error) {
-        console.error('Error fetching comments:', error);
-        return;
-      }
-
-      setComments(data || []);
+      if (error) throw error;
+      setReplies(data || []);
     } catch (error) {
-      console.error('Error fetching comments:', error);
+      console.error('Error fetching replies:', error);
     }
   };
 
-  const handleSubmitComment = async () => {
-    if (!user || !newComment.trim()) return;
+  const handleSubmitReply = async () => {
+    if (!user || !replyContent.trim()) return;
 
-    setSubmittingComment(true);
     try {
+      setSubmittingReply(true);
+      
       const { error } = await supabase
         .from('community_post_replies')
         .insert({
           post_id: id,
           user_id: user.id,
-          content: newComment.trim()
+          content: replyContent.trim()
         });
 
-      if (error) {
-        console.error('Error creating comment:', error);
-        toast.error('댓글 작성 중 오류가 발생했습니다.');
-        return;
-      }
+      if (error) throw error;
 
-      setNewComment("");
-      toast.success('댓글이 작성되었습니다.');
-      fetchComments();
-      fetchPost(); // 댓글 수 업데이트를 위해
+      setReplyContent('');
+      fetchReplies(); // 댓글 목록 새로고침
+      
     } catch (error) {
-      console.error('Error creating comment:', error);
-      toast.error('댓글 작성 중 오류가 발생했습니다.');
+      console.error('Error submitting reply:', error);
+      alert('댓글 작성 중 오류가 발생했습니다.');
     } finally {
-      setSubmittingComment(false);
+      setSubmittingReply(false);
     }
   };
 
-  const handleDeletePost = async () => {
-    if (!user || !post || post.user_id !== user.id) return;
-    
-    if (!window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) return;
+  const handleEditReply = async (replyId: string) => {
+    if (!editContent.trim()) return;
 
     try {
       const { error } = await supabase
-        .from('community_posts')
-        .delete()
-        .eq('id', id);
+        .from('community_post_replies')
+        .update({ content: editContent.trim() })
+        .eq('id', replyId)
+        .eq('user_id', user?.id);
 
-      if (error) {
-        console.error('Error deleting post:', error);
-        toast.error('게시글 삭제 중 오류가 발생했습니다.');
-        return;
+      if (error) throw error;
+
+      setEditingReply(null);
+      setEditContent('');
+      fetchReplies();
+      
+    } catch (error) {
+      console.error('Error editing reply:', error);
+      alert('댓글 수정 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleDeleteReply = async (replyId: string, replyUserId: string) => {
+    // 댓글 작성자 또는 관리자만 삭제 가능
+    if (user?.id !== replyUserId && userRole !== 'admin') {
+      alert('삭제 권한이 없습니다.');
+      return;
+    }
+
+    if (!confirm('댓글을 삭제하시겠습니까?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('community_post_replies')
+        .delete()
+        .eq('id', replyId);
+
+      if (error) throw error;
+
+      fetchReplies();
+      
+    } catch (error) {
+      console.error('Error deleting reply:', error);
+      alert('댓글 삭제 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleLike = async () => {
+    if (!user) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    try {
+      // 이미 좋아요를 눌렀는지 확인
+      const { data: existingLike } = await supabase
+        .from('community_post_likes')
+        .select('id')
+        .eq('post_id', id)
+        .eq('user_id', user.id)
+        .single();
+
+      if (existingLike) {
+        // 좋아요 취소
+        await supabase
+          .from('community_post_likes')
+          .delete()
+          .eq('post_id', id)
+          .eq('user_id', user.id);
+      } else {
+        // 좋아요 추가
+        await supabase
+          .from('community_post_likes')
+          .insert({
+            post_id: id,
+            user_id: user.id
+          });
       }
 
-      toast.success('게시글이 삭제되었습니다.');
-      navigate('/community');
+      fetchPost(); // 좋아요 수 새로고침
+      
     } catch (error) {
-      console.error('Error deleting post:', error);
-      toast.error('게시글 삭제 중 오류가 발생했습니다.');
+      console.error('Error handling like:', error);
     }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">게시글을 불러오는 중...</p>
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg">로딩 중...</div>
         </div>
       </div>
     );
@@ -197,349 +241,225 @@ const CommunityPost = () => {
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <p className="text-muted-foreground mb-4">게시글을 찾을 수 없습니다.</p>
-          <Link to="/community">
-            <Button>커뮤니티로 돌아가기</Button>
-          </Link>
+          <h2 className="text-2xl font-bold mb-4">게시글을 찾을 수 없습니다</h2>
+          <Button onClick={() => navigate('/community')}>
+            커뮤니티로 돌아가기
+          </Button>
         </div>
       </div>
     );
   }
 
-  const getCategoryInfo = (category: string) => {
-    const categories = {
-      notice: { name: "공지사항", color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300" },
-      qa: { name: "질문&답변", color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300" },
-      success_story: { name: "성공스토리", color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" },
-      networking: { name: "네트워킹", color: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300" }
-    };
-    return categories[category as keyof typeof categories] || { name: category, color: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300" };
-  };
-
-  const formatTimeAgo = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-    
-    if (diffInMinutes < 60) {
-      return `${diffInMinutes}분 전`;
-    } else if (diffInMinutes < 1440) {
-      return `${Math.floor(diffInMinutes / 60)}시간 전`;
-    } else {
-      return `${Math.floor(diffInMinutes / 1440)}일 전`;
-    }
-  };
-
-  const getAuthorDisplayName = () => {
-    return author?.display_name || author?.email || '사용자';
-  };
-
-  const getAuthorInitials = () => {
-    const name = getAuthorDisplayName();
-    return name.length >= 2 ? name.substring(0, 2).toUpperCase() : name.substring(0, 1).toUpperCase();
-  };
-
-  const categoryInfo = getCategoryInfo(post.category);
-
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="bg-secondary border-b border-border">
-        <div className="container-custom py-6">
-          <Link to="/community">
-            <Button variant="ghost" className="mb-4">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              커뮤니티로 돌아가기
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      {/* 뒤로가기 버튼 */}
+      <Button
+        variant="outline"
+        onClick={() => navigate('/community')}
+        className="mb-6"
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        커뮤니티로 돌아가기
+      </Button>
+
+      {/* 게시글 */}
+      <Card className="mb-6">
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="flex items-center space-x-3">
+              <Avatar className="h-12 w-12">
+                <AvatarImage src={post.user?.avatar_url} />
+                <AvatarFallback>
+                  {post.user?.display_name?.charAt(0).toUpperCase() || 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <CardTitle className="text-xl">{post.title}</CardTitle>
+                <div className="flex items-center space-x-4 text-sm text-gray-600">
+                  <span>{post.user?.display_name || '익명'}</span>
+                  <span>{formatDate(post.created_at)}</span>
+                  {post.updated_at !== post.created_at && (
+                    <span className="text-gray-500">(수정됨)</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="prose max-w-none">
+            <p className="whitespace-pre-wrap">{post.content}</p>
+          </div>
+
+          {/* 이미지 표시 */}
+          {post.images && post.images.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {post.images.map((imageUrl, index) => (
+                <div key={index} className="relative">
+                  <img
+                    src={imageUrl}
+                    alt={`게시글 이미지 ${index + 1}`}
+                    className="w-full h-auto rounded-lg"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* 좋아요 버튼 */}
+          <div className="flex items-center space-x-4 pt-4 border-t">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLike}
+              className="flex items-center space-x-2"
+            >
+              <Heart className="h-4 w-4" />
+              <span>{post.likes_count}</span>
             </Button>
-          </Link>
-        </div>
-      </div>
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <MessageSquare className="h-4 w-4" />
+              <span>댓글 {replies.length}개</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Content */}
-      <div className="container-custom py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-3">
-            <Card>
-              <CardHeader>
-                {/* Post Header */}
-                <div className="space-y-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
-                        <span className="text-primary-foreground font-medium">
-                          {getAuthorInitials()}
-                        </span>
-                      </div>
-                      <div>
+      {/* 댓글 작성 */}
+      {user && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-lg">댓글 작성</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <Textarea
+                placeholder="댓글을 입력하세요..."
+                value={replyContent}
+                onChange={(e) => setReplyContent(e.target.value)}
+                rows={3}
+              />
+              <div className="flex justify-end">
+                <Button
+                  onClick={handleSubmitReply}
+                  disabled={submittingReply || !replyContent.trim()}
+                >
+                  {submittingReply ? '작성 중...' : '댓글 작성'}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 댓글 목록 */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">댓글 ({replies.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {replies.length > 0 ? (
+            <div className="space-y-4">
+              {replies.map((reply) => (
+                <div key={reply.id} className="border-b pb-4 last:border-b-0">
+                  <div className="flex items-start space-x-3">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={reply.user?.avatar_url} />
+                      <AvatarFallback>
+                        {reply.user?.display_name?.charAt(0).toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2">
-                          <span className="font-semibold">{getAuthorDisplayName()}</span>
-                          {post.is_pinned && <Pin className="w-4 h-4 text-primary" />}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          커뮤니티 멤버
-                        </div>
-                        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                          <Clock className="w-3 h-3" />
-                          <span>{formatTimeAgo(post.created_at)}</span>
-                          <Badge className={`text-xs ${categoryInfo.color}`}>
-                            {categoryInfo.name}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                     
-                    {user && post.user_id === user.id && (
-                      <div className="flex gap-2">
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => navigate(`/community/${id}/edit`)}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={handleDeletePost}
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <h1 className="text-2xl md:text-3xl font-bold">{post.title}</h1>
-                  
-                  <div className="flex flex-wrap gap-2">
-                    {post.tags.map((tag, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        #{tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </CardHeader>
-              
-              <CardContent>
-                {/* Post Content */}
-                <div className="prose prose-gray max-w-none mb-8">
-                  <div className="whitespace-pre-line text-muted-foreground leading-relaxed">
-                    {post.content}
-                  </div>
-                </div>
-                
-                {/* Post Actions */}
-                <div className="flex items-center justify-between pt-6 border-t border-border">
-                  <div className="flex items-center space-x-6">
-                    <button className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-primary transition-colors">
-                      <ThumbsUp className="w-5 h-5" />
-                      <span>{post.likes_count}</span>
-                    </button>
-                    <button className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-primary transition-colors">
-                      <MessageSquare className="w-5 h-5" />
-                      <span>{post.replies_count}개 댓글</span>
-                    </button>
-                    <button className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-primary transition-colors">
-                      <Share className="w-5 h-5" />
-                      <span>공유</span>
-                    </button>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="sm">
-                      <Heart className="w-4 h-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Flag className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Comments Section */}
-            <Card className="mt-6">
-              <CardHeader>
-                <CardTitle>댓글 ({post.replies_count})</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Write Comment */}
-                {user && (
-                  <div className="space-y-4">
-                    <div className="flex items-start space-x-3">
-                      <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                        <User className="w-4 h-4 text-primary-foreground" />
-                      </div>
-                      <div className="flex-1 space-y-3">
-                        <Textarea 
-                          placeholder="댓글을 작성해보세요..." 
-                          className="min-h-[80px]"
-                          value={newComment}
-                          onChange={(e) => setNewComment(e.target.value)}
-                        />
-                        <div className="flex justify-end">
-                          <Button 
-                            variant="hero" 
-                            size="sm"
-                            onClick={handleSubmitComment}
-                            disabled={!newComment.trim() || submittingComment}
-                          >
-                            <Send className="w-4 h-4 mr-2" />
-                            {submittingComment ? '작성 중...' : '댓글 작성'}
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Comments List */}
-                {comments.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                    <p>아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {comments.map((comment) => (
-                      <div key={comment.id} className="flex items-start space-x-3 p-4 rounded-lg bg-secondary/50">
-                        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                          <span className="text-primary-foreground text-xs font-medium">
-                            {comment.profiles?.display_name?.substring(0, 2).toUpperCase() || 
-                             comment.profiles?.email?.substring(0, 2).toUpperCase() || 'U'}
+                          <span className="font-medium">
+                            {reply.user?.display_name || '익명'}
                           </span>
+                          <span className="text-sm text-gray-500">
+                            {formatDate(reply.created_at)}
+                          </span>
+                          {reply.updated_at !== reply.created_at && (
+                            <span className="text-xs text-gray-400">(수정됨)</span>
+                          )}
                         </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center space-x-2">
-                              <span className="font-medium text-sm">
-                                {comment.profiles?.display_name || comment.profiles?.email || '사용자'}
-                              </span>
-                              <span className="text-xs text-muted-foreground">
-                                {formatTimeAgo(comment.created_at)}
-                              </span>
-                            </div>
-                            {user && comment.user_id === user.id && (
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={async () => {
-                                  if (window.confirm('댓글을 삭제하시겠습니까?')) {
-                                    try {
-                                      const { error } = await supabase
-                                        .from('community_post_replies')
-                                        .delete()
-                                        .eq('id', comment.id);
-                                      
-                                      if (error) throw error;
-                                      
-                                      toast.success('댓글이 삭제되었습니다.');
-                                      fetchComments();
-                                      fetchPost();
-                                    } catch (error) {
-                                      console.error('Error deleting comment:', error);
-                                      toast.error('댓글 삭제 중 오류가 발생했습니다.');
-                                    }
-                                  }
-                                }}
-                                className="text-destructive hover:text-destructive"
-                              >
-                                <Trash2 className="w-3 h-3" />
-                              </Button>
+                        
+                        {/* 댓글 작성자 또는 관리자만 수정/삭제 가능 */}
+                        {(user?.id === reply.user_id || userRole === 'admin') && (
+                          <div className="flex items-center space-x-2">
+                            {editingReply === reply.id ? (
+                              <>
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleEditReply(reply.id)}
+                                >
+                                  저장
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setEditingReply(null);
+                                    setEditContent('');
+                                  }}
+                                >
+                                  취소
+                                </Button>
+                              </>
+                            ) : (
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setEditingReply(reply.id);
+                                    setEditContent(reply.content);
+                                  }}
+                                >
+                                  <Edit className="h-3 w-3 mr-1" />
+                                  수정
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleDeleteReply(reply.id, reply.user_id)}
+                                  className="text-red-600 hover:text-red-700"
+                                >
+                                  <Trash2 className="h-3 w-3 mr-1" />
+                                  삭제
+                                </Button>
+                              </>
                             )}
                           </div>
-                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-                            {comment.content}
-                          </p>
-                        </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Author Info */}
-            <Card>
-              <CardHeader>
-                <CardTitle>작성자 정보</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
-                    <span className="text-primary-foreground font-medium">
-                      {getAuthorInitials()}
-                    </span>
-                  </div>
-                  <div>
-                    <div className="font-semibold">{getAuthorDisplayName()}</div>
-                    <div className="text-sm text-muted-foreground">
-                      커뮤니티 멤버
+                      
+                      {editingReply === reply.id ? (
+                        <div className="space-y-2">
+                          <Textarea
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                            rows={2}
+                          />
+                        </div>
+                      ) : (
+                        <p className="text-gray-700 whitespace-pre-wrap">
+                          {reply.content}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
-                <Button variant="professional" className="w-full">
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  메시지 보내기
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Post Stats */}
-            <Card>
-              <CardHeader>
-                <CardTitle>게시물 통계</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">좋아요</span>
-                  <span className="font-medium">{post.likes_count}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">댓글</span>
-                  <span className="font-medium">{post.replies_count}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">조회수</span>
-                  <span className="font-medium">-</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Related Posts */}
-            <Card>
-              <CardHeader>
-                <CardTitle>관련 게시물</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {[
-                  { id: 2, title: "아마존 면접 후기 공유합니다", category: "success-stories" },
-                  { id: 3, title: "시스템 디자인 면접 준비 팁", category: "qa" },
-                  { id: 4, title: "개발자 네트워킹 모임 안내", category: "networking" }
-                ].map((relatedPost) => (
-                  <Link 
-                    key={relatedPost.id} 
-                    to={`/community/${relatedPost.id}`}
-                    className="block p-3 rounded-lg border border-border hover:bg-secondary transition-colors"
-                  >
-                    <h4 className="font-medium text-sm">{relatedPost.title}</h4>
-                    <Badge variant="outline" className="text-xs mt-1">
-                      {getCategoryInfo(relatedPost.category).name}
-                    </Badge>
-                  </Link>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
