@@ -379,15 +379,15 @@ BEGIN
     tp.work_type,
     tp.remote_preference,
     tp.created_at,
-    p.display_name,
-    p.avatar_url
+    pp.display_name,
+    pp.avatar_url
   FROM public.talent_profiles tp
-  JOIN public.profiles p ON tp.user_id = p.id
+  JOIN public.public_profiles pp ON tp.user_id = pp.id
   WHERE tp.status = 'approved'
     AND (_search_term IS NULL OR (
       tp.title ILIKE '%' || _search_term || '%' OR
       tp.summary ILIKE '%' || _search_term || '%' OR
-      p.display_name ILIKE '%' || _search_term || '%'
+      pp.display_name ILIKE '%' || _search_term || '%'
     ))
     AND (_skills IS NULL OR tp.skills && _skills)
     AND (_experience_min IS NULL OR tp.experience_years >= _experience_min)

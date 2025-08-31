@@ -378,11 +378,10 @@ BEGIN
         'skills', tp.skills,
         'experience_years', tp.experience_years,
         'created_at', tp.created_at,
-        'user_email', p.email,
-        'user_display_name', p.display_name
+        'user_display_name', pp.display_name
       )
     ) FROM public.talent_profiles tp
-    JOIN public.profiles p ON tp.user_id = p.id
+    JOIN public.public_profiles pp ON tp.user_id = pp.id
     WHERE tp.status = 'pending'
     ORDER BY tp.created_at ASC) as pending_talents,
     
@@ -396,11 +395,10 @@ BEGIN
         'skills', tp.skills,
         'approved_at', tp.approved_at,
         'expires_at', tp.expires_at,
-        'user_email', p.email,
-        'user_display_name', p.display_name
+        'user_display_name', pp.display_name
       )
     ) FROM public.talent_profiles tp
-    JOIN public.profiles p ON tp.user_id = p.id
+    JOIN public.public_profiles pp ON tp.user_id = pp.id
     WHERE tp.status = 'approved'
     ORDER BY tp.approved_at DESC) as approved_talents,
     
@@ -412,11 +410,10 @@ BEGIN
         'title', tp.title,
         'admin_notes', tp.admin_notes,
         'created_at', tp.created_at,
-        'user_email', p.email,
-        'user_display_name', p.display_name
+        'user_display_name', pp.display_name
       )
     ) FROM public.talent_profiles tp
-    JOIN public.profiles p ON tp.user_id = p.id
+    JOIN public.public_profiles pp ON tp.user_id = pp.id
     WHERE tp.status = 'rejected'
     ORDER BY tp.created_at DESC) as rejected_talents,
     
@@ -428,11 +425,10 @@ BEGIN
         'title', tp.title,
         'approved_at', tp.approved_at,
         'expires_at', tp.expires_at,
-        'user_email', p.email,
-        'user_display_name', p.display_name
+        'user_display_name', pp.display_name
       )
     ) FROM public.talent_profiles tp
-    JOIN public.profiles p ON tp.user_id = p.id
+    JOIN public.public_profiles pp ON tp.user_id = pp.id
     WHERE tp.status = 'expired'
     ORDER BY tp.expires_at DESC) as expired_talents,
     
@@ -443,7 +439,7 @@ BEGIN
       'approved_count', COUNT(*) FILTER (WHERE status = 'approved'),
       'rejected_count', COUNT(*) FILTER (WHERE status = 'rejected'),
       'expired_count', COUNT(*) FILTER (WHERE status = 'expired'),
-      'total_users', (SELECT COUNT(*) FROM public.profiles),
+      'total_users', (SELECT COUNT(*) FROM public.public_profiles),
       'total_applications', (SELECT COUNT(*) FROM public.talent_applications)
     ) FROM public.talent_profiles) as stats;
 END;
