@@ -95,13 +95,13 @@ const Home = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/talent">
-                <Button variant="secondary" size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+                <Button variant="secondary" size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 hover:scale-105 transition-transform">
                   <Users className="w-5 h-5 mr-2" />
                   인재 찾기
                 </Button>
               </Link>
               <Link to="/jobs">
-                <Button variant="outline" size="lg" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+                <Button variant="outline" size="lg" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary hover:scale-105 transition-transform">
                   <Briefcase className="w-5 h-5 mr-2" />
                   취업처 찾기
                 </Button>

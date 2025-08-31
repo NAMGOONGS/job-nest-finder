@@ -17,31 +17,34 @@ import AdminDashboard from './pages/AdminDashboard';
 import NotFound from './pages/NotFound';
 import MyPage from './pages/MyPage';
 import TalentRegister from './pages/TalentRegister';
+import { AuthProvider } from './hooks/useAuth';
 
 function App() {
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/jobs" element={<JobBoard />} />
-          <Route path="/jobs/:id" element={<JobDetail />} />
-          <Route path="/talent" element={<TalentPool />} />
-          <Route path="/talent/:id" element={<TalentDetail />} />
-          <Route path="/talent/register" element={<TalentRegister />} />
-          <Route path="/community" element={<Community />} />
-          <Route path="/community/write" element={<CommunityWrite />} />
-          <Route path="/community/:id" element={<CommunityPost />} />
-          <Route path="/community/:id/edit" element={<CommunityEdit />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/mypage" element={<MyPage />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Layout>
-      <Toaster />
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/jobs" element={<JobBoard />} />
+            <Route path="/jobs/:id" element={<JobDetail />} />
+            <Route path="/talent" element={<TalentPool />} />
+            <Route path="/talent/:id" element={<TalentDetail />} />
+            <Route path="/talent/register" element={<TalentRegister />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/community/write" element={<CommunityWrite />} />
+            <Route path="/community/:id" element={<CommunityPost />} />
+            <Route path="/community/:id/edit" element={<CommunityEdit />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/mypage" element={<MyPage />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Layout>
+        <Toaster />
+      </Router>
+    </AuthProvider>
   );
 }
 
