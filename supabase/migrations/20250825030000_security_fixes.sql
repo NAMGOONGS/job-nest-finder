@@ -44,16 +44,34 @@ BEGIN
 END;
 $$;
 
--- 3. RLS 정책 강화 - profiles 테이블
+-- 3. RLS 정책 강화 - profiles 테이블 (보안 강화)
+-- 🚨 보안 경고: 이메일 주소 공개 노출 위험
+-- 사용자는 자신의 프로필만 볼 수 있음
 DROP POLICY IF EXISTS "Public profiles are viewable by everyone" ON public.profiles;
-CREATE POLICY "Users can view profiles" 
+DROP POLICY IF EXISTS "Users can view profiles" ON public.profiles;
+
+CREATE POLICY "Users can only view their own profile (email protected)" 
 ON public.profiles 
 FOR SELECT 
-USING (
-  -- 본인 프로필 또는 공개 정보만 조회 가능
-  auth.uid() = id OR 
-  display_name IS NOT NULL
-);
+USING (auth.uid() = id);
+
+-- 공개 프로필 뷰 생성 (민감한 정보 제외)
+CREATE OR REPLACE VIEW public.public_profiles AS
+SELECT 
+  id,
+  display_name,
+  avatar_url,
+  created_at,
+  updated_at
+  -- 이메일 주소는 제외 (보안상 위험)
+FROM public.profiles
+WHERE display_name IS NOT NULL;
+
+-- 공개 프로필 뷰에 대한 RLS 정책
+CREATE POLICY "Anyone can view public profile info (no email)" 
+ON public.public_profiles 
+FOR SELECT 
+USING (true);
 
 -- 4. RLS 정책 강화 - user_roles 테이블
 DROP POLICY IF EXISTS "Users can view all roles" ON public.user_roles;
