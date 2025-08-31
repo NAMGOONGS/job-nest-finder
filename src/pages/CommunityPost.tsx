@@ -74,7 +74,7 @@ const CommunityPost: React.FC = () => {
         .from('community_posts')
         .select(`
           *,
-          user:profiles(display_name, avatar_url)
+          user:public_profiles(display_name, avatar_url)
         `)
         .eq('id', id)
         .single();
@@ -94,7 +94,7 @@ const CommunityPost: React.FC = () => {
         .from('community_post_replies')
         .select(`
           *,
-          user:profiles(display_name, avatar_url)
+          user:public_profiles(display_name, avatar_url)
         `)
         .eq('post_id', id)
         .order('created_at', { ascending: true });
